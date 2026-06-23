@@ -1,15 +1,10 @@
 package pages;
 
+import io.qameta.allure.Step;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
-public class MainPage {
-
-    private final WebDriver driver;
-
-    public MainPage(WebDriver driver){
-        this.driver = driver;
-    }
+public class MainPage extends BasePage {
 
     private final By loginButton =
             By.xpath("//button[text()='Войти в аккаунт']");
@@ -26,48 +21,61 @@ public class MainPage {
     private final By fillingsTab =
             By.xpath("//span[text()='Начинки']");
 
-    public void open(){
+    private final By activeSaucesTab =
+            By.xpath("//div[contains(@class,'tab_tab_type_current')]//span[text()='Соусы']");
+
+    private final By activeFillingsTab =
+            By.xpath("//div[contains(@class,'tab_tab_type_current')]//span[text()='Начинки']");
+
+    private final By activeBunsTab =
+            By.xpath("//div[contains(@class,'tab_tab_type_current')]//span[text()='Булки']");
+
+    public MainPage(WebDriver driver) {
+        super(driver);
+    }
+
+    @Step("Открыть главную страницу")
+    public void open() {
         driver.get("https://stellarburgers.education-services.ru/");
     }
 
-    public void clickLoginButton(){
-        driver.findElement(loginButton).click();
+    @Step("Нажать кнопку 'Войти в аккаунт'")
+    public void clickLoginButton() {
+        click(loginButton);
     }
 
-    public void clickProfileButton(){
-        driver.findElement(profileButton).click();
+    @Step("Перейти в личный кабинет")
+    public void clickProfileButton() {
+        click(profileButton);
     }
 
-    public void clickSauces(){
-        driver.findElement(saucesTab).click();
+    @Step("Перейти в раздел Соусы")
+    public void clickSauces() {
+        click(saucesTab);
     }
 
-    public void clickFillings(){
-        driver.findElement(fillingsTab).click();
+    @Step("Перейти в раздел Начинки")
+    public void clickFillings() {
+        click(fillingsTab);
     }
 
-    public void clickBuns(){
-        driver.findElement(bunsTab).click();
+    @Step("Перейти в раздел Булки")
+    public void clickBuns() {
+        click(bunsTab);
     }
 
-    public boolean isSaucesSelected(){
-
-        return driver.findElement(
-                By.xpath("//div[contains(@class,'tab_tab_type_current')]//span[text()='Соусы']")
-        ).isDisplayed();
+    @Step("Проверить, что раздел Соусы активен")
+    public boolean isSaucesSelected() {
+        return isDisplayed(activeSaucesTab);
     }
 
-    public boolean isFillingsSelected(){
-
-        return driver.findElement(
-                By.xpath("//div[contains(@class,'tab_tab_type_current')]//span[text()='Начинки']")
-        ).isDisplayed();
+    @Step("Проверить, что раздел Начинки активен")
+    public boolean isFillingsSelected() {
+        return isDisplayed(activeFillingsTab);
     }
 
-    public boolean isBunsSelected(){
-
-        return driver.findElement(
-                By.xpath("//div[contains(@class,'tab_tab_type_current')]//span[text()='Булки']")
-        ).isDisplayed();
+    @Step("Проверить, что раздел Булки активен")
+    public boolean isBunsSelected() {
+        return isDisplayed(activeBunsTab);
     }
 }

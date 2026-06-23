@@ -1,8 +1,8 @@
 # Allure
-.allure/
-allure-results/
-allure-report/
-target/site/allure/
+# .allure/
+# allure-results/
+# allure-report/
+# target/site/allure/
 
 # IntelliJ IDEA
 .idea/

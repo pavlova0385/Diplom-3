@@ -1,92 +1,131 @@
 package tests;
 
+import client.UserClient;
 import driver.BaseTest;
+import io.restassured.response.Response;
+import model.User;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import pages.LoginPage;
 import pages.MainPage;
 import pages.RegisterPage;
+import utils.UserGenerator;
 
 public class LoginTest extends BaseTest {
 
-    private final String email = "ТВОЙ_EMAIL";
-    private final String password = "ТВОЙ_ПАРОЛЬ";
+    private UserClient userClient;
+    private User user;
+    private String accessToken;
+
+    @Before
+    public void createUser() {
+
+        userClient = new UserClient();
+
+        user = UserGenerator.getRandomUser();
+
+        Response response =
+                userClient.create(user);
+
+        accessToken =
+                response.path("accessToken");
+    }
+
+    @After
+    public void deleteUser() {
+
+        if (accessToken != null) {
+            userClient.delete(accessToken);
+        }
+    }
 
     @Test
-    public void loginFromMainPage(){
+    public void loginFromMainPage() {
 
-        MainPage main = new MainPage(driver);
+        MainPage mainPage = new MainPage(driver);
 
-        main.open();
+        mainPage.open();
+        mainPage.clickLoginButton();
 
-        main.clickLoginButton();
+        LoginPage loginPage =
+                new LoginPage(driver);
 
-        LoginPage login = new LoginPage(driver);
-
-        login.login(email,password);
+        loginPage.login(
+                user.getEmail(),
+                user.getPassword()
+        );
 
         Assert.assertTrue(
-                driver.getCurrentUrl().contains("/")
+                loginPage.isUserLoggedIn()
         );
     }
 
     @Test
-    public void loginFromPersonalAccount(){
+    public void loginFromPersonalAccount() {
 
-        MainPage main = new MainPage(driver);
+        MainPage mainPage = new MainPage(driver);
 
-        main.open();
+        mainPage.open();
+        mainPage.clickProfileButton();
 
-        main.clickProfileButton();
+        LoginPage loginPage =
+                new LoginPage(driver);
 
-        LoginPage login = new LoginPage(driver);
-
-        login.login(email,password);
+        loginPage.login(
+                user.getEmail(),
+                user.getPassword()
+        );
 
         Assert.assertTrue(
-                driver.getCurrentUrl().contains("/")
+                loginPage.isUserLoggedIn()
         );
     }
 
     @Test
-    public void loginFromRegisterForm(){
+    public void loginFromRegisterForm() {
 
-        RegisterPage register =
+        RegisterPage registerPage =
                 new RegisterPage(driver);
 
-        register.open();
+        registerPage.open();
 
-        register.clickLoginLink();
+        LoginPage loginPage =
+                registerPage.clickLoginLink();
 
-        LoginPage login = new LoginPage(driver);
-
-        login.login(email,password);
+        loginPage.login(
+                user.getEmail(),
+                user.getPassword()
+        );
 
         Assert.assertTrue(
-                driver.getCurrentUrl().contains("/")
+                loginPage.isUserLoggedIn()
         );
     }
 
     @Test
-    public void loginFromForgotPassword(){
+    public void loginFromForgotPassword() {
 
-        driver.get(
-                "https://stellarburgers.education-services.ru/login"
-        );
+        MainPage mainPage =
+                new MainPage(driver);
+
+        mainPage.open();
+        mainPage.clickLoginButton();
 
         LoginPage loginPage =
                 new LoginPage(driver);
 
         loginPage.clickForgotPasswordLink();
+        loginPage.clickLoginFromForgotPassword();
 
-        driver.findElement(
-                org.openqa.selenium.By.xpath("//a[text()='Войти']")
-        ).click();
-
-        loginPage.login(email,password);
+        loginPage.login(
+                user.getEmail(),
+                user.getPassword()
+        );
 
         Assert.assertTrue(
-                driver.getCurrentUrl().contains("/")
+                loginPage.isUserLoggedIn()
         );
     }
 }

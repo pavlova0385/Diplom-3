@@ -1,18 +1,13 @@
 package pages;
 
+import io.qameta.allure.Step;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
-public class LoginPage {
-
-    private final WebDriver driver;
-
-    public LoginPage(WebDriver driver){
-        this.driver = driver;
-    }
+public class LoginPage extends BasePage {
 
     private final By emailField =
-            By.xpath("//label[text()='Email']/following-sibling::input");
+            By.xpath("//input[contains(@class,'text input__textfield') and @type='text']");
 
     private final By passwordField =
             By.xpath("//input[@type='password']");
@@ -26,21 +21,41 @@ public class LoginPage {
     private final By forgotPasswordLink =
             By.xpath("//a[@href='/forgot-password']");
 
-    public void login(String email,
-                      String password){
+    private final By loginLinkFromForgotPassword =
+            By.xpath("//a[@href='/login']");
 
-        driver.findElement(emailField).sendKeys(email);
+    private final By profileButton =
+            By.xpath("//p[text()='Личный Кабинет']");
 
-        driver.findElement(passwordField).sendKeys(password);
-
-        driver.findElement(loginButton).click();
+    public LoginPage(WebDriver driver) {
+        super(driver);
     }
 
-    public void clickRegisterLink(){
-        driver.findElement(registerLink).click();
+    @Step("Авторизация пользователя")
+    public void login(String email, String password) {
+
+        sendKeys(emailField, email);
+        sendKeys(passwordField, password);
+        click(loginButton);
     }
 
-    public void clickForgotPasswordLink(){
-        driver.findElement(forgotPasswordLink).click();
+    @Step("Переход на регистрацию")
+    public void clickRegisterLink() {
+        click(registerLink);
+    }
+
+    @Step("Переход на восстановление пароля")
+    public void clickForgotPasswordLink() {
+        click(forgotPasswordLink);
+    }
+
+    @Step("Переход на страницу логина")
+    public void clickLoginFromForgotPassword() {
+        click(loginLinkFromForgotPassword);
+    }
+
+    @Step("Проверка авторизации")
+    public boolean isUserLoggedIn() {
+        return isDisplayed(profileButton);
     }
 }

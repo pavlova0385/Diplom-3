@@ -1,88 +1,84 @@
 package pages;
 
-import org.openqa.selenium.By;
+import io.qameta.allure.Step;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
 
-import java.time.Duration;
+public class RegisterPage extends BasePage {
 
-public class RegisterPage {
+    @FindBy(xpath = "//label[text()='Имя']/following-sibling::input")
+    private WebElement nameField;
 
-    private final WebDriver driver;
-    private final WebDriverWait wait;
+    @FindBy(xpath = "//label[text()='Email']/following-sibling::input")
+    private WebElement emailField;
+
+    @FindBy(xpath = "//label[text()='Пароль']/following-sibling::input")
+    private WebElement passwordField;
+
+    @FindBy(xpath = "//button[text()='Зарегистрироваться']")
+    private WebElement registerButton;
+
+    @FindBy(xpath = "//a[@href='/login']")
+    private WebElement loginLink;
+
+    @FindBy(xpath = "//p[text()='Некорректный пароль']")
+    private WebElement passwordError;
 
     public RegisterPage(WebDriver driver) {
-        this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        super(driver);
+        PageFactory.initElements(driver, this);
     }
 
-    private final By nameField =
-            By.xpath("//label[text()='Имя']/following-sibling::input");
-
-    private final By emailField =
-            By.xpath("//label[text()='Email']/following-sibling::input");
-
-    private final By passwordField =
-            By.xpath("//input[@type='password']");
-
-    private final By registerButton =
-            By.xpath("//button[text()='Зарегистрироваться']");
-
-    private final By loginLink =
-            By.xpath("//a[text()='Войти']");
-
-    private final By passwordError =
-            By.xpath("//*[contains(text(),'Некорректный пароль')]");
-
-    private final By loginButton =
-            By.xpath("//button[text()='Войти']");
-
-    public void open() {
+    @Step("Открыть страницу регистрации")
+    public RegisterPage open() {
         driver.get("https://stellarburgers.education-services.ru/register");
+        return this;
     }
 
-    public void register(String name,
-                         String email,
-                         String password) {
+    @Step("Зарегистрировать пользователя")
+    public RegisterPage register(String name, String email, String password) {
 
-        wait.until(
-                ExpectedConditions.visibilityOfElementLocated(nameField)
-        ).sendKeys(name);
+        nameField.clear();
+        nameField.sendKeys(name);
 
-        driver.findElement(emailField).sendKeys(email);
+        emailField.clear();
+        emailField.sendKeys(email);
 
-        driver.findElement(passwordField).sendKeys(password);
+        passwordField.clear();
+        passwordField.sendKeys(password);
 
-        driver.findElement(registerButton).click();
+        registerButton.click();
+
+        return this;
     }
 
-    public void clickLoginLink() {
-        wait.until(
-                ExpectedConditions.elementToBeClickable(loginLink)
-        ).click();
+    @Step("Клик по ссылке Войти")
+    public LoginPage clickLoginLink() {
+
+        loginLink.click();
+
+        return new LoginPage(driver);
     }
 
-    public boolean isPasswordErrorVisible() {
+    @Step("Проверка открытия страницы логина")
+    public boolean isLoginPageOpened() {
 
         try {
-            wait.until(
-                    ExpectedConditions.visibilityOfElementLocated(passwordError)
-            );
+            wait.until(driver ->
+                    driver.getCurrentUrl().contains("/login"));
             return true;
         } catch (Exception e) {
             return false;
         }
     }
 
-    public boolean isLoginPageOpened() {
+    @Step("Проверка отображения ошибки пароля")
+    public boolean isPasswordErrorVisible() {
 
         try {
-            wait.until(
-                    ExpectedConditions.visibilityOfElementLocated(loginButton)
-            );
-            return true;
+            return passwordError.isDisplayed();
         } catch (Exception e) {
             return false;
         }
